@@ -1,0 +1,54 @@
+@startuml "Diagramme de classe"
+skinparam linetype ortho
+
+class utilisateur {
+    + int id_client <<PK>>
+    --
+    + String mdp
+    + String nom
+    + String prenom
+    + int argent
+}
+
+class Animal {
+    + String nom_animal <<PK>>
+    --
+    + String type_animal
+    + int santé
+    + int famine
+    + int joie
+    + int fatigue
+    + Date date_naissance
+}
+
+class Chat
+class perroquet
+class canard
+class herisson
+class lapin
+
+class Items{
+    + cout
+}
+class vetements{
+
+}
+class jouets{
+
+}
+class nourriture
+class soin
+
+utilisateur "1" -- "1..*" Animal : adopter >
+utilisateur "1"--"0..*" Items : acheter >
+Items -- vetements
+Items -- jouets
+Items -- nourriture
+Items -- soin
+Animal -- Chat
+Animal -- perroquet
+Animal -- canard
+Animal -- herisson
+Animal -- lapin
+
+@enduml
