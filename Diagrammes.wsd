@@ -55,17 +55,24 @@ Animal -- lapin
 
 @startuml "Cas d'utilisation"
 left to right direction
-actor Client
+actor Utilisateur
 rectangle "Systeme"{
+    usecase "Creer compte" as UC3
     usecase "S'occuper de l'animal" as UC1
     usecase "Donner à manger" as UC1.1
     usecase "Joeur avec" as UC1.2
     usecase "Soigner" as UC1.3
     usecase "Faire dormir" as UC1.4
+    usecase "Jouer mini-jeux" as UC2
+    usecase "Acheter dans la boutique" as UC4
+
     UC1.>UC1.1:<<include>>
     UC1.>UC1.2:<<include>>
     UC1.>UC1.3:<<include>>
-    UC1.>UC1.4:<<include>>z
+    UC1.>UC1.4:<<include>>
 }
-Client -->UC1
+Utilisateur -->UC1
+Utilisateur -->UC2
+Utilisateur -->UC3
+Utilisateur -->UC4
 @enduml
