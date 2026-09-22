@@ -52,3 +52,20 @@ Animal -- herisson
 Animal -- lapin
 
 @enduml
+
+@startuml "Cas d'utilisation"
+left to right direction
+actor Client
+rectangle "Systeme"{
+    usecase "S'occuper de l'animal" as UC1
+    usecase "Donner à manger" as UC1.1
+    usecase "Joeur avec" as UC1.2
+    usecase "Soigner" as UC1.3
+    usecase "Faire dormir" as UC1.4
+    UC1.>UC1.1:<<include>>
+    UC1.>UC1.2:<<include>>
+    UC1.>UC1.3:<<include>>
+    UC1.>UC1.4:<<include>>z
+}
+Client -->UC1
+@enduml
