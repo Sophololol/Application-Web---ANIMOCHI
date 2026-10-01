@@ -145,28 +145,74 @@ participant "ControleurCompte" as CC
 participant "ControleurAnimal" as CA
 participant "ControleurBoutique" as CB
 participant "ControleurMiniJeu" as CMJ
-participant "Inventaire" as I
-participant "Animal" as A
-participant "Items" as It
-participant "MiniJeu" as MJ
-participant "Partie" as P
-participant "Experience" as E
-participant "Succès" as S
 
 U->IJ:S'authentifier()
 activate IJ
-IJ->CC:verifierIdentifiants()
-CC-->IJ:connexionOK()
+ref over IJ, CC:S'authentifier
+ref over IJ, CC:Récompense Quotidienne
 
+U->IJ:Consulter etat animal
+ref over IJ, CA:Consulter etat animal
+U->IJ:Nourrir animal
+ref over IJ, CA:Nourrir animal
+U->IJ:Jouer avec animal
+ref over IJ, CA:Jouer avec animal
+U->IJ:Soigner animal
+ref over IJ, CA:Soigner animal
+U->IJ:Faire dormir animal
+ref over IJ, CA:Faire dormir animal
+
+U->IJ:Acheter item
+ref over IJ, CB:Acheter item
+U->IJ:Changer vêtements
+ref over IJ, CB:Changer vêtements
+
+U->IJ:Lancer mini-jeu
+ref over IJ, CMJ:Jouer mini-jeu
+U->IJ:Fin de mini jeu
+ref over IJ, CMJ:Fin mini-jeu
+U->IJ:Voir succès
+ref over IJ, CMJ:Verifier succes
+deactivate IJ
+@enduml
+
+@startuml S'authentifier
+title "Sous-diagramme : S'authentifier"
+actor Utilisateur as U
+participant InterfaceJeu as IJ
+participant ControleurCompte as CC
+U -> IJ : saisirIdentifiants()
+IJ -> CC : verifierIdentifiants()
+CC --> IJ : connexionOK()
+@enduml
+
+@startuml Recompense
+title "Sous-diagramme : Récompense Quotidienne"
+participant InterfaceJeu as IJ
+participant ControleurCompte as CC
 IJ->CC:verifierRecompense()
 CC-->IJ:afficherRecompense()
+@enduml
 
+@startuml Consulter l'etat
+actor Utilisateur as U
+participant InterfaceJeu as IJ
+participant "ControleurAnimal" as CA
+participant "Animal" as A
 U->IJ:Consulter état de l'animal
 IJ->CA:getEtatAnimal()
 CA->A:lireJauges()
 A-->CA:jauges
 CA-->IJ:afficherEtat()
+@enduml
 
+@startuml Nourrir
+title "Sous-diagramme : Nourrir l'animal"
+actor "Utilisateur" as U
+participant "InterfaceJeu" as IJ
+participant "ControleurAnimal" as CA
+participant "Inventaire" as I
+participant "Animal" as A
 U->IJ:Nourrir animal
 IJ->CA:nourrirAnimal()
 CA->I:verifierNourriture()
@@ -174,13 +220,29 @@ I-->CA:quantiéOK
 CA->A:augmenterFaim()
 A-->CA:etatMisAJour
 CA-->IJ:afficherNouvelEtat()
+@enduml
 
+@startuml Jouer
+title "Sous-diagramme : Jouer avec l'animal"
+actor "Utilisateur" as U
+participant "InterfaceJeu" as IJ
+participant "ControleurAnimal" as CA
+participant "Inventaire" as I
+participant "Animal" as A
 U->IJ:Jouer avec l'animal
 IJ->CA:jouerAvecAnimal()
 CA->A:augmenterJoie()
 A-->CA:étatMisAJour
 CA-->IJ:afficherNouvelEtat()
+@enduml
 
+@startuml Soigner
+title "Sous-diagramme : Soigner l'animal"
+actor "Utilisateur" as U
+participant "InterfaceJeu" as IJ
+participant "ControleurAnimal" as CA
+participant "Inventaire" as I
+participant "Animal" as A
 U->IJ:Soigner animal
 IJ->CA:soignerAnimal()
 CA->I:verifierSoin()
@@ -188,13 +250,29 @@ I-->CA:OK
 CA->A:augmenterSante()
 A-->CA:étatMisAJour
 CA-->IJ:afficherNouvelEtat()
+@enduml
 
+@startuml Dormir
+title "Sous-diagramme : Faire dormir l'animal"
+actor "Utilisateur" as U
+participant "InterfaceJeu" as IJ
+participant "ControleurAnimal" as CA
+participant "Inventaire" as I
+participant "Animal" as A
 U->IJ:Faire dormir
 IJ->CA:faireDormir()
 CA->A:augmenterFatigue()
 A-->CA:étatMisAJour
 CA-->IJ:afficherNouvelEtat()
+@enduml
 
+@startuml Acheter
+title "Sous-diagramme : Acheter items"
+actor "Utilisateur" as U
+participant "InterfaceJeu" as IJ
+participant "ControleurBoutique" as CB
+participant "Inventaire" as I
+participant "Items" as It
 U->IJ:Acheter item
 IJ->CB:acheterItem(id_item)
 CB->It:getItem(id_item)
@@ -202,26 +280,52 @@ It-->CB:infosItem
 CB->I:ajouterItem(id_item)
 I-->CB:confirmation
 CB-->IJ:afficherAchat()
+@enduml
 
+@startuml Changer
+title "Sous-diagramme : Changer vêtements"
+actor "Utilisateur" as U
+participant "InterfaceJeu" as IJ
+participant "ControleurAnimal" as CA
+participant "Animal" as A
 U->IJ:Changer vêtements
 IJ->CA:appliquerVetement()
 CA->A:changerVetement
 A-->CA:OK
 CA-->IJ:afficherVetement()
+@enduml
 
-U->IJ:Lancer mini-jeu
-IJ->CMJ:demarrerJeu(id_jeu)
+@startuml Lancer mini-jeu
+title "Sous-diagramme : Lancer mini-jeu"
+actor "Utilisateur" as U
+participant "InterfaceMiniJeu" as IMJ
+participant "ControleurMiniJeu" as CMJ
+participant "MiniJeu" as MJ
+U->IMJ:Lancer mini-jeu
+IMJ->CMJ:demarrerJeu(id_jeu)
 CMJ->MJ:chargerInfos()
 MJ-->CMJ:infosJeu
-'--jsp s'il faut faire dans un cas different la fin du jeu--'
-IJ->CMJ:finDePartie(score)
+@enduml
+
+@startuml Fin mini-jeu
+title "Sous-diagramme : Fin mini-jeu"
+participant "InterfaceMiniJeu" as IMJ
+participant "ControleurMiniJeu" as CMJ
+participant "Partie" as P
+participant "Experience" as E
+IMJ->CMJ:finDePartie(score)
 CMJ->P:enregistrer(score)
 P-->CMJ:gains(argent, xp)
 CMJ->E:ajouterXP(xp)
 E-->CMJ:niveauMisAJour
+CMJ-->IMJ:afficherGains()
+@enduml
+
+@startuml Verifier succès
+participant "InterfaceJeu" as IJ
+participant "ControleurMiniJeu" as CMJ
+participant "Succès" as S
 CMJ->S:verifierSucces()
 S-->CMJ:succesDebloques
-
 CMJ-->IJ:afficherGainsEtSucces()
-deactivate IJ
 @enduml
