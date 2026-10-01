@@ -1,4 +1,5 @@
 @startuml "Diagramme de classe"
+title "Diagramme de classes"
 skinparam linetype ortho
 
 class utilisateur {
@@ -54,10 +55,11 @@ Animal -- lapin
 @enduml
 
 @startuml "Cas d'utilisation"
+title "Diagramme de cas d'utilisation"
 left to right direction
 actor Utilisateur
 rectangle "Systeme"{
-    usecase "Creer compte" as UC3
+    usecase "Gerer compte" as UC3
     usecase "S'occuper de l'animal" as UC1
     usecase "Donner à manger" as UC1.1
     usecase "Joeur avec" as UC1.2
@@ -75,4 +77,8 @@ Utilisateur -->UC1
 Utilisateur -->UC2
 Utilisateur -->UC3
 Utilisateur -->UC4
+@enduml
+
+@startuml "Diagramme de séquence"
+title "Diagramme de séquence"
 @enduml
