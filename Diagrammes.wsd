@@ -2,7 +2,7 @@
 title "Diagramme de classes"
 skinparam linetype ortho
 
-class utilisateur {
+class Utilisateur {
     + int id_client <<PK>>
     --
     + String mdp
@@ -21,36 +21,75 @@ class Animal {
     + int fatigue
     + Date date_naissance
 }
-
+Utilisateur "1" -- "0..*" Animal : adopter >
 class Chat
 class perroquet
 class canard
 class herisson
 class lapin
+Animal <|-- Chat
+Animal <|-- perroquet
+Animal <|-- canard
+Animal <|-- herisson
+Animal <|-- lapin
 
+class Inventaire{
+    + int id_inventaire <<PK>>
+    --
+    + int quantite
+}
+Utilisateur "1" -- "0..*" Inventaire : avoir >
 class Items{
-    + cout
+    + int id_item <<PK>>
+    --
+    + int cout
+    + String nom
 }
-class vetements{
-
-}
-class jouets{
-
-}
+class vetements
+class jouets
 class nourriture
 class soin
+Items "1" -- "0..*" Inventaire : contient >
+Items <|-- vetements
+Items <|-- jouets
+Items <|-- nourriture
+Items <|-- soin
 
-utilisateur "1" -- "1..*" Animal : adopter >
-utilisateur "1"--"0..*" Items : acheter >
-Items -- vetements
-Items -- jouets
-Items -- nourriture
-Items -- soin
-Animal -- Chat
-Animal -- perroquet
-Animal -- canard
-Animal -- herisson
-Animal -- lapin
+Animal "1" -- "0..1" jouets : jouetPréféré >
+
+class Experience{
+    + int niveau
+    + int xp
+}
+Utilisateur "1" -- "1" Experience : possède >
+
+class Succès{
+    + int id_succes <<PK>>
+    --
+    + String nom
+    + String description
+}
+class UtilisateurSucces {
+    + Date date_obtention
+}
+Utilisateur "1" -- "0..*" UtilisateurSucces
+Succès "1" -- "0..*" UtilisateurSucces
+
+class MiniJeu{
+    + int id_jeu <<PK>>
+    --
+    + String nom
+    + int gain_argent
+    + int gain_xp
+}
+class Partie {
+    + int gain_argent
+    + int gain_xp
+    + Date date
+}
+
+Utilisateur "1" -- "0..*" Partie : joue >
+MiniJeu "1" -- "0..*" Partie : est_joué >
 
 @enduml
 
