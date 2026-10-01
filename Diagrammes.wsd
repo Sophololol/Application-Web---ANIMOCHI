@@ -98,24 +98,43 @@ title "Diagramme de cas d'utilisation"
 left to right direction
 actor Utilisateur
 rectangle "Systeme"{
-    usecase "Gerer compte" as UC3
+    usecase "S'authentifier" as UC0
+    usecase "Gerer profil" as UC3
     usecase "S'occuper de l'animal" as UC1
     usecase "Donner à manger" as UC1.1
-    usecase "Joeur avec" as UC1.2
+    usecase "Jouer avec" as UC1.2
     usecase "Soigner" as UC1.3
     usecase "Faire dormir" as UC1.4
-    usecase "Jouer mini-jeux" as UC2
-    usecase "Acheter dans la boutique" as UC4
+    usecase "Consulter état de l'animal" as UC1.5
 
     UC1.>UC1.1:<<include>>
     UC1.>UC1.2:<<include>>
     UC1.>UC1.3:<<include>>
     UC1.>UC1.4:<<include>>
+    UC1.>UC1.5:<<include>>
+
+    usecase "Acheter dans la boutique" as UC2
+    usecase "Consulter inventaire" as UC2.1
+    usecase "Changer vêtements" as UC2.2
+
+    UC2.>UC2.1:<<include>>
+    UC2.>UC2.2:<<extend>>
+
+    usecase "Jouer mini-jeux" as UC4
+    usecase "Gagner argent et XP" as UC4.1
+
+    UC4.>UC4.1:<<include>>
+
+    usecase "Consulter succès" as UC5
+    usecase "Recevoir récompense quotidienne" as UC6
+
 }
 Utilisateur -->UC1
 Utilisateur -->UC2
 Utilisateur -->UC3
 Utilisateur -->UC4
+Utilisateur -->UC5
+Utilisateur -->UC6
 @enduml
 
 @startuml "Diagramme de séquence"
