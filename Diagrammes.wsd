@@ -138,5 +138,90 @@ Utilisateur -->UC6
 @enduml
 
 @startuml "Diagramme de séquence"
-title "Diagramme de séquence"
+title "Diagramme de séquence global - Animochi"
+actor "Utilisateur" as U
+participant "InterfaceJeu" as IJ
+participant "ControleurCompte" as CC
+participant "ControleurAnimal" as CA
+participant "ControleurBoutique" as CB
+participant "ControleurMiniJeu" as CMJ
+participant "Inventaire" as I
+participant "Animal" as A
+participant "Items" as It
+participant "MiniJeu" as MJ
+participant "Partie" as P
+participant "Experience" as E
+participant "Succès" as S
+
+U->IJ:S'authentifier()
+activate IJ
+IJ->CC:verifierIdentifiants()
+CC-->IJ:connexionOK()
+
+IJ->CC:verifierRecompense()
+CC-->IJ:afficherRecompense()
+
+U->IJ:Consulter état de l'animal
+IJ->CA:getEtatAnimal()
+CA->A:lireJauges()
+A-->CA:jauges
+CA-->IJ:afficherEtat()
+
+U->IJ:Nourrir animal
+IJ->CA:nourrirAnimal()
+CA->I:verifierNourriture()
+I-->CA:quantiéOK
+CA->A:augmenterFaim()
+A-->CA:etatMisAJour
+CA-->IJ:afficherNouvelEtat()
+
+U->IJ:Jouer avec l'animal
+IJ->CA:jouerAvecAnimal()
+CA->A:augmenterJoie()
+A-->CA:étatMisAJour
+CA-->IJ:afficherNouvelEtat()
+
+U->IJ:Soigner animal
+IJ->CA:soignerAnimal()
+CA->I:verifierSoin()
+I-->CA:OK
+CA->A:augmenterSante()
+A-->CA:étatMisAJour
+CA-->IJ:afficherNouvelEtat()
+
+U->IJ:Faire dormir
+IJ->CA:faireDormir()
+CA->A:augmenterFatigue()
+A-->CA:étatMisAJour
+CA-->IJ:afficherNouvelEtat()
+
+U->IJ:Acheter item
+IJ->CB:acheterItem(id_item)
+CB->It:getItem(id_item)
+It-->CB:infosItem
+CB->I:ajouterItem(id_item)
+I-->CB:confirmation
+CB-->IJ:afficherAchat()
+
+U->IJ:Changer vêtements
+IJ->CA:appliquerVetement()
+CA->A:changerVetement
+A-->CA:OK
+CA-->IJ:afficherVetement()
+
+U->IJ:Lancer mini-jeu
+IJ->CMJ:demarrerJeu(id_jeu)
+CMJ->MJ:chargerInfos()
+MJ-->CMJ:infosJeu
+'--jsp s'il faut faire dans un cas different la fin du jeu--'
+IJ->CMJ:finDePartie(score)
+CMJ->P:enregistrer(score)
+P-->CMJ:gains(argent, xp)
+CMJ->E:ajouterXP(xp)
+E-->CMJ:niveauMisAJour
+CMJ->S:verifierSucces()
+S-->CMJ:succesDebloques
+
+CMJ-->IJ:afficherGainsEtSucces()
+deactivate IJ
 @enduml
