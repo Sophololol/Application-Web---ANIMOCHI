@@ -93,6 +93,12 @@ class MiniJeu{
     + gainArgent() : int
     + gainXP() : int
 }
+class Memory
+class 2048
+class Dino
+MiniJeu <|-- Memory
+MiniJeu <|-- 2048
+MiniJeu <|-- Dino
 
 Utilisateur "1" -- "0..*" MiniJeu : joue >
 
