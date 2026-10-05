@@ -9,6 +9,8 @@ class Utilisateur {
     + String nom
     + String prenom
     + int argent
+    --
+    + seConnecter(mdp : String) : boolean
 }
 
 class Animal {
@@ -20,6 +22,11 @@ class Animal {
     + int joie
     + int fatigue
     + Date date_naissance
+    --
+    + nourrir() : void
+    + jouer() : void
+    + dormir() : void
+    + soigner() : void
 }
 Utilisateur "1" -- "0..*" Animal : adopter >
 class Chat
@@ -35,8 +42,6 @@ Animal <|-- lapin
 
 class Inventaire{
     + int id_inventaire <<PK>>
-    --
-    + int quantite
 }
 Utilisateur "1" -- "0..*" Inventaire : avoir >
 class Items{
@@ -50,6 +55,9 @@ class jouets
 class nourriture
 class soin
 Items "1" -- "0..*" Inventaire : contient >
+note on link
+    =int quantité
+end note
 Items <|-- vetements
 Items <|-- jouets
 Items <|-- nourriture
@@ -69,11 +77,11 @@ class Succès{
     + String nom
     + String description
 }
-class UtilisateurSucces {
-    + Date date_obtention
-}
-Utilisateur "1" -- "0..*" UtilisateurSucces
-Succès "1" -- "0..*" UtilisateurSucces
+
+Utilisateur "1" -- "0..*" Succès : obtient >
+note on link
+    =Date date_obtention
+end note
 
 class MiniJeu{
     + int id_jeu <<PK>>
@@ -81,15 +89,12 @@ class MiniJeu{
     + String nom
     + int gain_argent
     + int gain_xp
-}
-class Partie {
-    + int gain_argent
-    + int gain_xp
-    + Date date
+    --
+    + gainArgent() : int
+    + gainXP() : int
 }
 
-Utilisateur "1" -- "0..*" Partie : joue >
-MiniJeu "1" -- "0..*" Partie : est_joué >
+Utilisateur "1" -- "0..*" MiniJeu : joue >
 
 @enduml
 
