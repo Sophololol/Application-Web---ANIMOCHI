@@ -9,6 +9,8 @@ class Utilisateur {
     + String nom
     + String prenom
     + int argent
+    + int niveau
+    + int xp
     --
     + seConnecter(mdp : String) : boolean
 }
@@ -59,12 +61,6 @@ Items <|-- soin
 
 Animal "1" -- "0..1" jouets : jouetPréféré >
 
-class Experience{
-    + int niveau
-    + int xp
-}
-Utilisateur "1" -- "1" Experience : possède >
-
 class Succès{
     + int id_succes <<PK>>
     --
@@ -99,12 +95,12 @@ Utilisateur "1" -- "0..*" MiniJeu : joue >
 @enduml
 
 @startuml "Cas d'utilisation"
-title "Diagramme de cas d'utilisation"
+title "Diagramme de cas d'utilisation - ANIMOCHI"
 left to right direction
 actor Utilisateur
 rectangle "Systeme"{
     usecase "S'authentifier" as UC0
-    usecase "Gerer profil" as UC3
+    usecase "Acceder boutique" as UC3
     usecase "S'occuper de l'animal" as UC1
     usecase "Donner à manger" as UC1.1
     usecase "Jouer avec" as UC1.2
@@ -148,83 +144,103 @@ actor "Utilisateur" as U
 participant "InterfaceJeu" as IJ
 participant "ControleurCompte" as CC
 participant "ControleurAnimal" as CA
+participant "Animal" as A
+participant "Inventaire" as I
+participant "Items" as It
 participant "ControleurBoutique" as CB
+participant "InterfaceMiniJeu" as IMJ
 participant "ControleurMiniJeu" as CMJ
+participant "MiniJeu" as MJ
+participant "Partie" as P
+participant "Experience" as E
+participant "Succès" as S
 
 U->IJ:S'authentifier()
 activate IJ
-ref over IJ, CC:S'authentifier
-ref over IJ, CC:Récompense Quotidienne
+alt Client non authentifié 
+    U -> IJ : saisirIdentifiants()
+    IJ -> CC : verifierIdentifiants()
+    CC --> IJ : connexionOK()
+    
+    opt Recompense Quoitidienne disponible
+        IJ->CC:verifierRecompense()
+        CC-->IJ:afficherRecompense()
+    end
+else Client déjà authentifie
+    'Rien à faire
+end
 
-U->IJ:Consulter etat animal
-ref over IJ, CA:Consulter etat animal
-U->IJ:Nourrir animal
-ref over IJ, CA:Nourrir animal
-U->IJ:Jouer avec animal
-ref over IJ, CA:Jouer avec animal
-U->IJ:Soigner animal
-ref over IJ, CA:Soigner animal
-U->IJ:Faire dormir animal
-ref over IJ, CA:Faire dormir animal
+opt L'utilisateur consulte l'état de l'animal
+    U->IJ:Consulter état de l'animal
+    IJ->CA:getEtatAnimal()
+    CA->A:lireJauges()
+    A-->CA:jauges
+    CA-->IJ:afficherEtat()
+end
 
-U->IJ:Acheter item
-ref over IJ, CB:Acheter item
-U->IJ:Changer vêtements
-ref over IJ, CB:Changer vêtements
+opt L'utilisateur nourrit l'animal
+    U->IJ:Nourrir animal
+    IJ->CA:nourrirAnimal()
+    CA->I:verifierNourriture()
+    I-->CA:quantitéOK
+    CA->A:augmenterFaim()
+    A-->CA:etatMisAJour
+    CA-->IJ:afficherNouvelEtat()
+end
 
-U->IJ:Lancer mini-jeu
-ref over IJ, CMJ:Jouer mini-jeu
-U->IJ:Fin de mini jeu
-ref over IJ, CMJ:Fin mini-jeu
-U->IJ:Voir succès
-ref over IJ, CMJ:Verifier succes
+opt L'utilisateur joue avec l'animal
+    U->IJ:Jouer avec animal
+    ref over IJ, CA:Jouer avec animal
+end
+
+opt L'utilisateur soigne l'animal
+    U->IJ:Soigner animal
+    ref over IJ, CA:Soigner animal
+end
+
+opt L'utilisateur fait dormir l'animal
+    U->IJ:Faire dormir animal
+    ref over IJ, CA:Faire dormir animal
+end
+
+opt L'utilisateur achète un item
+    U->IJ:Acheter item
+    IJ->CB:acheterItem(id_item)
+    CB->It:getItem(id_item)
+    It-->CB:infosItem
+    CB->I:ajouterItem(id_item)
+    I-->CB:confirmation
+    CB-->IJ:afficherAchat()
+end
+
+opt L'utilisateur change les vêtements
+    U->IJ:Changer vêtements
+    IJ->CA:appliquerVetement()
+    CA->A:changerVetement
+    A-->CA:OK
+    CA-->IJ:afficherVetement()
+end
+
+opt L’utilisateur lance un mini-jeu
+    U->IJ:Lancer mini-jeu
+    IJ->CMJ:demarrerJeu(id_jeu)
+    CMJ->MJ:chargerInfos()
+    MJ-->CMJ:infosJeu
+
+    U->IJ:Fin de mini jeu
+    IJ->CMJ:finDePartie(score)
+    CMJ->P:enregistrer(score)
+    P-->CMJ:gains(argent, xp)
+    CMJ->E:ajouterXP(xp)
+    E-->CMJ:niveauMisAJour
+    CMJ-->IJ:afficherGains()
+
+    IJ->CMJ:Verifier succes
+    CMJ->S:verifierSucces()
+    S-->CMJ:succesDebloques
+    CMJ-->IJ:afficherGainsEtSucces()
+end
 deactivate IJ
-@enduml
-
-@startuml S'authentifier
-title "Sous-diagramme : S'authentifier"
-actor Utilisateur as U
-participant InterfaceJeu as IJ
-participant ControleurCompte as CC
-U -> IJ : saisirIdentifiants()
-IJ -> CC : verifierIdentifiants()
-CC --> IJ : connexionOK()
-@enduml
-
-@startuml Recompense
-title "Sous-diagramme : Récompense Quotidienne"
-participant InterfaceJeu as IJ
-participant ControleurCompte as CC
-IJ->CC:verifierRecompense()
-CC-->IJ:afficherRecompense()
-@enduml
-
-@startuml Consulter l'etat
-actor Utilisateur as U
-participant InterfaceJeu as IJ
-participant "ControleurAnimal" as CA
-participant "Animal" as A
-U->IJ:Consulter état de l'animal
-IJ->CA:getEtatAnimal()
-CA->A:lireJauges()
-A-->CA:jauges
-CA-->IJ:afficherEtat()
-@enduml
-
-@startuml Nourrir
-title "Sous-diagramme : Nourrir l'animal"
-actor "Utilisateur" as U
-participant "InterfaceJeu" as IJ
-participant "ControleurAnimal" as CA
-participant "Inventaire" as I
-participant "Animal" as A
-U->IJ:Nourrir animal
-IJ->CA:nourrirAnimal()
-CA->I:verifierNourriture()
-I-->CA:quantiéOK
-CA->A:augmenterFaim()
-A-->CA:etatMisAJour
-CA-->IJ:afficherNouvelEtat()
 @enduml
 
 @startuml Jouer
@@ -269,68 +285,4 @@ IJ->CA:faireDormir()
 CA->A:augmenterFatigue()
 A-->CA:étatMisAJour
 CA-->IJ:afficherNouvelEtat()
-@enduml
-
-@startuml Acheter
-title "Sous-diagramme : Acheter items"
-actor "Utilisateur" as U
-participant "InterfaceJeu" as IJ
-participant "ControleurBoutique" as CB
-participant "Inventaire" as I
-participant "Items" as It
-U->IJ:Acheter item
-IJ->CB:acheterItem(id_item)
-CB->It:getItem(id_item)
-It-->CB:infosItem
-CB->I:ajouterItem(id_item)
-I-->CB:confirmation
-CB-->IJ:afficherAchat()
-@enduml
-
-@startuml Changer
-title "Sous-diagramme : Changer vêtements"
-actor "Utilisateur" as U
-participant "InterfaceJeu" as IJ
-participant "ControleurAnimal" as CA
-participant "Animal" as A
-U->IJ:Changer vêtements
-IJ->CA:appliquerVetement()
-CA->A:changerVetement
-A-->CA:OK
-CA-->IJ:afficherVetement()
-@enduml
-
-@startuml Lancer mini-jeu
-title "Sous-diagramme : Lancer mini-jeu"
-actor "Utilisateur" as U
-participant "InterfaceMiniJeu" as IMJ
-participant "ControleurMiniJeu" as CMJ
-participant "MiniJeu" as MJ
-U->IMJ:Lancer mini-jeu
-IMJ->CMJ:demarrerJeu(id_jeu)
-CMJ->MJ:chargerInfos()
-MJ-->CMJ:infosJeu
-@enduml
-
-@startuml Fin mini-jeu
-title "Sous-diagramme : Fin mini-jeu"
-participant "InterfaceMiniJeu" as IMJ
-participant "ControleurMiniJeu" as CMJ
-participant "Partie" as P
-participant "Experience" as E
-IMJ->CMJ:finDePartie(score)
-CMJ->P:enregistrer(score)
-P-->CMJ:gains(argent, xp)
-CMJ->E:ajouterXP(xp)
-E-->CMJ:niveauMisAJour
-CMJ-->IMJ:afficherGains()
-@enduml
-
-@startuml Verifier succès
-participant "InterfaceJeu" as IJ
-participant "ControleurMiniJeu" as CMJ
-participant "Succès" as S
-CMJ->S:verifierSucces()
-S-->CMJ:succesDebloques
-CMJ-->IJ:afficherGainsEtSucces()
 @enduml
