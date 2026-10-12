@@ -1,5 +1,5 @@
 @startuml "Diagramme de classe"
-title "Diagramme de classes"
+title "Diagramme de classes - ANIMOCHI"
 skinparam linetype ortho
 
 class Utilisateur {
@@ -30,15 +30,7 @@ class Animal {
 }
 Utilisateur "1" -- "0..*" Animal : adopter >
 class Chat
-class perroquet
-class canard
-class herisson
-class lapin
 Animal <|-- Chat
-Animal <|-- perroquet
-Animal <|-- canard
-Animal <|-- herisson
-Animal <|-- lapin
 
 class Inventaire{
     + int id_inventaire <<PK>>
@@ -52,7 +44,9 @@ class Items{
 }
 class vetements
 class jouets
-class nourriture
+class nourriture{
+    + int satiété
+}
 class soin
 Items "1" -- "0..*" Inventaire : contient >
 note on link
